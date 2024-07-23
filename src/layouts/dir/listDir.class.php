@@ -18,7 +18,7 @@
          * @var                      string
          */
         protected string $query = '{
-            "query": "query { folders(limit: %d, page: %d) { total data { id name type created_at } } }",
+            "query": "query { folders(limit: %d, page: %d) { total data { id name path type created_at } } }",
             "variables": {}
         }';
 
