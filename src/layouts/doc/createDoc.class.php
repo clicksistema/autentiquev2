@@ -2,6 +2,13 @@
     namespace sysborg\autentiquev2;
 
 class createDoc extends common implements \sysborg\autentiquev2\layouts{
+        //valores possíveis para tipo de contato do signatário
+        protected array $signers_type = [
+            'email',
+            'sms',
+            'whatsapp',
+        ];
+        
         /**
          * @description-en-US:       Stores informations and variables for this layout
          * @description-pt-BR:       Armazena informações e variáveis para esse layout
@@ -47,14 +54,47 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
          */
         public function addSigners(string $email) : docSignaturePosition
         {
-            $this->verifyEmail('email', $email);
+            if(!in_array($type,$this->signers_type)){
+                return (0);
+            }
+            if($type === 'email'){
+                $this->verifyEmail('email', $email);
+            }
             $positions = new docSignaturePosition();
-            array_push($this->signers, [
-                'email'     => $email,
-                'action'    => 'SIGN',
-                'positionsObject' => $positions
-            ]);
-
+            
+            if($cpf){
+                if($security){
+                    array_push($this->signers, [
+                        'email'                     => $email,
+                        'action'                    => $action,
+                        'configs'                   => ['cpf' => $cpf], 
+                        'security_verifications'    => [(object)['type' => 'MANUAL']],
+                        'positionsObject'           => $positions
+                    ]);
+                }else{
+                    array_push($this->signers, [
+                        'email'                     => $email,
+                        'action'                    => $action,
+                        'configs'                   => ['cpf' => $cpf],
+                        'positionsObject'           => $positions
+                    ]);
+                }
+            }else{
+                if($security){
+                    array_push($this->signers, [
+                        'email'                     => $email,
+                        'action'                    => $action,
+                        'security_verifications'    => [(object)['type' => 'MANUAL']],
+                        'positionsObject'           => $positions
+                    ]);
+                }else{
+                    array_push($this->signers, [
+                        'email'                     => $email,
+                        'action'                    => $action,
+                        'positionsObject'           => $positions
+                    ]);
+                }
+            }
             return $positions;
         }
 
@@ -94,6 +134,8 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
             $this->verifyFill('file', $this->file);
             $this->verifyFile('file', $this->file);
             $this->verifyArray('signers', $this->signers);
+
+            //die("1|".json_encode($this->signersToParse()));
 
             $query = sprintf($this->query, $this->name, json_encode($this->signersToParse()));
 
