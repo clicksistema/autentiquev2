@@ -16,7 +16,8 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
          */
         protected array $layoutInfo = [
             'name' => NULL, 
-            'file' => NULL
+            'file' => NULL,
+            'folder_id'
         ];
 
         /**
@@ -40,7 +41,7 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
          */
         protected string $query = '{
             "query": "mutation CreateDocumentMutation( $document: DocumentInput!, $signers: [SignerInput!]!, $file: Upload! ) { createDocument( sandbox: {{ %sandbox }}, document: $document, signers: $signers, file: $file ) { id name refusable sortable created_at signatures { public_id name email created_at action { name } link { short_link } user { id name email } } } }",
-            "variables": { "document": { "name": "%s" }, "signers": %s, "file": null }
+            "variables": { "document": { "name": "%s", "folder_id": "%s" }, "signers": %s, "file": null }
         }';
 
         /**
@@ -137,7 +138,7 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
 
             //die("1|".json_encode($this->signersToParse()));
 
-            $query = sprintf($this->query, $this->name, json_encode($this->signersToParse()));
+            $query = sprintf($this->query, $this->name, $this->folder_id, json_encode($this->signersToParse()));
 
             if($this->sandbox === null){
                 $this->setDevMode(false);
