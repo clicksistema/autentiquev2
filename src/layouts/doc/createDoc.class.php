@@ -53,7 +53,7 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
          * param                    string $email - "Email of the signer | Email do assinante"
          * return                   docSignaturePosition
          */
-        public function addSigners(string $email) : docSignaturePosition
+        public function addSigners(String $email, $type = 'email',$cpf=NULL,$action='SIGN',$verification = NULL) : docSignaturePosition
         {
             if(!in_array($type,$this->signers_type)){
                 return (0);
@@ -62,40 +62,24 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
                 $this->verifyEmail('email', $email);
             }
             $positions = new docSignaturePosition();
-            
+            $signer = [
+                'email'           => $email,
+                'action'          => $action,
+                'positionsObject' => $positions
+            ];
+        
             if($cpf){
-                if($security){
-                    array_push($this->signers, [
-                        'email'                     => $email,
-                        'action'                    => $action,
-                        'configs'                   => ['cpf' => $cpf], 
-                        'security_verifications'    => [(object)['type' => 'MANUAL']],
-                        'positionsObject'           => $positions
-                    ]);
-                }else{
-                    array_push($this->signers, [
-                        'email'                     => $email,
-                        'action'                    => $action,
-                        'configs'                   => ['cpf' => $cpf],
-                        'positionsObject'           => $positions
-                    ]);
-                }
-            }else{
-                if($security){
-                    array_push($this->signers, [
-                        'email'                     => $email,
-                        'action'                    => $action,
-                        'security_verifications'    => [(object)['type' => 'MANUAL']],
-                        'positionsObject'           => $positions
-                    ]);
-                }else{
-                    array_push($this->signers, [
-                        'email'                     => $email,
-                        'action'                    => $action,
-                        'positionsObject'           => $positions
-                    ]);
-                }
+                $signer['configs'] = ['cpf' => $cpf];
             }
+        
+            if(!empty($verification)){
+                $signer['security_verifications'] = [
+                    (object)['type' => $verification]
+                ];
+            }
+            
+            $this->signers[] = $signer;
+
             return $positions;
         }
 
