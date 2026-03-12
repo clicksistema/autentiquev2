@@ -40,8 +40,8 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
          * @var                      string
          */
         protected string $query = '{
-            "query": "mutation CreateDocumentMutation( $document: DocumentInput!, $signers: [SignerInput!]!, $file: Upload! ) { createDocument( sandbox: {{ %sandbox }}, document: $document, signers: $signers, file: $file ) { id name refusable sortable created_at signatures { public_id name email created_at action { name } link { short_link } user { id name email } } } }",
-            "variables": { "document": %s, "signers": %s, "file": null }
+            "query": "mutation CreateDocumentMutation( $document: DocumentInput!, $signers: [SignerInput!]!, $file: Upload! ) { createDocument( sandbox: {{ %sandbox }}, document: $document, signers: $signers, file: $file%s ) { id name refusable sortable created_at signatures { public_id name email created_at action { name } link { short_link } user { id name email } } } }",
+            "variables": { "document": { "name": "%s" }, "signers": %s, "file": null }
         }';
 
         /**
@@ -135,22 +135,15 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
             $this->verifyFill('file', $this->file);
             $this->verifyFile('file', $this->file);
             $this->verifyArray('signers', $this->signers);
-
-            //die("1|".json_encode($this->signersToParse()));
             
-            $document = [
-                'name' => $this->name
-            ];
-        
-            if (!empty($this->folder_id)) {
-                $document['folder_id'] = $this->folder_id;
+            $pasta = $this->folder_id;
+            if(!empty($pasta)){
+                $query = sprintf($this->query,', folder_id: \"'.$pasta.'\"', $this->name, json_encode($this->signersToParse()));
+            }else{
+                $query = sprintf($this->query,'', $this->name, json_encode($this->signersToParse()));
             }
             
-            $query = sprintf($this->query, json_encode($document), json_encode($this->signersToParse()));
-
-            if($this->sandbox === null){
-                $this->setDevMode(false);
-            }
+            $this->setDevMode($this->sandbox);
         
             $arr = [
                 'operations' => $query,
