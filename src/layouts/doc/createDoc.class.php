@@ -24,7 +24,7 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
          * @description-pt-BR:       Armazena informações sobre se o documento será criado no modo sandbox ou não
          * @var                      bool
          */
-        protected bool $sandbox;
+        protected bool $sandbox = false;
 
         /**
          * @description-en-US:       Stores the query of graphql
@@ -32,7 +32,7 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
          * @var                      string
          */
         protected string $query = '{
-            "query": "mutation CreateDocumentMutation( $document: DocumentInput!, $signers: [SignerInput!]!, $file: Upload! ) { createDocument( sandbox: {{ %sandbox }}, document: $document, signers: $signers, file: $file ) { id name refusable sortable created_at signatures { public_id name email created_at action { name } link { short_link } user { id name email } } } }",
+            "query": "mutation CreateDocumentMutation( $document: DocumentInput!, $signers: [SignerInput!]!, $file: Upload! ) { createDocument( sandbox: {{ %sandbox }}, document: $document, signers: $signers, file: $file%s ) { id name refusable sortable created_at signatures { public_id name email created_at action { name } link { short_link } user { id name email } } } }",
             "variables": { "document": { "name": "%s" }, "signers": %s, "file": null }
         }';
 
@@ -95,12 +95,15 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
             $this->verifyFile('file', $this->file);
             $this->verifyArray('signers', $this->signers);
 
-            $query = sprintf($this->query, $this->name, json_encode($this->signersToParse()));
-
-            if($this->sandbox === null){
-                $this->setDevMode(false);
+            $pasta = $this->folder_id;
+            if(!empty($pasta)){
+                $query = sprintf($this->query,', folder_id: \"'.$pasta.'\"', $this->name, json_encode($this->signersToParse()));
+            }else{
+                $query = sprintf($this->query,'', $this->name, json_encode($this->signersToParse()));
             }
-        
+            
+            $this->setDevMode($this->sandbox);
+            
             $arr = [
                 'operations' => $query,
                 'map'        => '{"file": ["variables.file"]}',
