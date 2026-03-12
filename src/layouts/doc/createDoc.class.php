@@ -53,7 +53,7 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
          * param                    string $email - "Email of the signer | Email do assinante"
          * return                   docSignaturePosition
          */
-        public function addSigners(String $email, $type = 'email',$cpf=NULL,$action='SIGN',$verification = NULL) : docSignaturePosition
+        public function addSigners(String $email, $type = 'email',$cpf=NULL,$action='SIGN',$verification = NULL, $celular = NULL) : docSignaturePosition
         {
             if(!in_array($type,$this->signers_type)){
                 return (0);
@@ -73,9 +73,15 @@ class createDoc extends common implements \sysborg\autentiquev2\layouts{
             }
         
             if(!empty($verification)){
-                $signer['security_verifications'] = [
-                    (object)['type' => $verification]
-                ];
+                if($verification === 'SMS' && !empty($celular)){
+                    $signer['security_verifications'] = [
+                        (object)['type' => $verification, 'verify_phone' => $celular]
+                    ];
+                }elseif($verification !== 'SMS'){
+                    $signer['security_verifications'] = [
+                        (object)['type' => $verification]
+                    ];
+                }
             }
             
             $this->signers[] = $signer;
