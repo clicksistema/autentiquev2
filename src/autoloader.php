@@ -11,6 +11,7 @@
             'sysborg\autentiquev2\layouts'                  => '/layouts.interface.php',
             'sysborg\autentiquev2\common'                   => '/layouts/common.class.php',
             'sysborg\autentiquev2\listDir'                  => '/layouts/dir/listDir.class.php',
+            'sysborg\autentiquev2\createSubFolder'          => '/layouts/dir/createSubFolder.class.php',
             'sysborg\autentiquev2\createDir'                => '/layouts/dir/createDir.class.php',
             'sysborg\autentiquev2\deleteDir'                => '/layouts/dir/deleteDir.class.php',
             'sysborg\autentiquev2\rescueDir'                => '/layouts/dir/rescueDir.class.php',
