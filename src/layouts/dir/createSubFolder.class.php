@@ -18,24 +18,8 @@
          * @var                      string
          */
         protected string $query = '{
-        "query": "mutation CreateSubfolder($parent_id: UUID, $folder: FolderInput!) {
-          createFolder(parent_id: $parent_id, folder: $folder) {
-              id
-              name
-              slug
-              context
-              path
-              children_counter
-              created_at
-              updated_at
-            }
-          }",
-          "variables": {
-              "parent_id": "%s",
-              "folder": {
-                  "name": "%s"
-              }
-          }
+            "query": "mutation CreateSubfolder($parent_id: UUID, $folder: FolderInput!) { createFolder(parent_id: $parent_id, folder: $folder) {id name slug context path children_counter created_at updated_at } }",
+            "variables": { "parent_id": "%s", "folder": { "name": "%s" } }
         }';
 
         /**
